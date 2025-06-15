@@ -1,12 +1,12 @@
 {
-  "name": "auth-service",
+  "name": "@./auth-service",
   "version": "0.0.1",
   "private": true,
   "scripts": {
     "dev": "node src/main.ts"
   },
   "nx": {
-    "name": "@e-com-x/auth-service",
+    "name": "auth-service",
     "projectType": "application",
     "sourceRoot": "auth-service/src",
     "targets": {
@@ -17,15 +17,15 @@
           "build"
         ],
         "options": {
-          "buildTarget": "@e-com-x/auth-service:build",
+          "buildTarget": "auth-service:build",
           "runBuildTargetDependencies": false
         },
         "configurations": {
           "development": {
-            "buildTarget": "@e-com-x/auth-service:build:development"
+            "buildTarget": "auth-service:build:development"
           },
           "production": {
-            "buildTarget": "@e-com-x/auth-service:build:production"
+            "buildTarget": "auth-service:build:production"
           }
         }
       },
