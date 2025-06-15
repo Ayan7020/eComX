@@ -11,7 +11,7 @@
     "http"
   ],
   "paths": {
-    "/user-registration": {
+    "/api/user-registration": {
       "post": {
         "description": "",
         "parameters": [
@@ -25,7 +25,10 @@
                   "example": "Kalento"
                 },
                 "email": {
-                  "example": "kalento@gmail.com"
+                  "example": "ayanshaikh.pr@gmail.com"
+                },
+                 "password": {
+                  "example": "12345678"
                 }
               }
             }
