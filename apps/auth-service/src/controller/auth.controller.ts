@@ -3,6 +3,8 @@ import { checkOtpRestrictions, sendOTP, trackOTPRequests, validateRegistrationDa
 import prisma from "@packages/lib/prisma";
 import { AuthError, ValidationError } from "@packages/error-handler";
 import bcryptjs from "bcryptjs"
+import jwt from "jsonwebtoken"
+import { setCookie } from "../utils/cookies/setCookie";
 
 export const userRegisteration = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -66,11 +68,25 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
         if (!existingUser) {
             return next(new ValidationError("User doesn't exists"))
         };
-
         const isMatch = await bcryptjs.compare(password, existingUser.password!)
-        if(!isMatch) {
+        if (!isMatch) {
             return next(new AuthError("Invalid Email or Password"))
         }
+
+        const accesToken = jwt.sign({ id: existingUser.id, role: "User" }, process.env.ACCESS_TOKEN_SECRET as string, { expiresIn: "15m" })
+        const refreshToken = jwt.sign({ id: existingUser.id, role: "User" }, process.env.REFRESH_TOKEN_SECRET as string, { expiresIn: "7d" })
+
+        setCookie(res, "refresh_token", refreshToken)
+        setCookie(res, "access_token", accesToken)
+
+        res.status(200).json({
+            message: "Login Successfull",
+            user: {
+                id: existingUser.id,
+                email: existingUser.email,
+                name: existingUser.name
+            }
+        })
 
 
     } catch (error) {
