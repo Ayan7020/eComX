@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { checkOtpRestrictions, sendOTP, trackOTPRequests, validateRegistrationData, verifyOtp } from "../utils/auth.helper";
+import { checkOtpRestrictions, handleForgotPassword, sendOTP, trackOTPRequests, validateRegistrationData, verifyForgotPasswordOtp, verifyOtp } from "../utils/auth.helper";
 import prisma from "@packages/lib/prisma";
 import { AuthError, ValidationError } from "@packages/error-handler";
 import bcryptjs from "bcryptjs"
@@ -89,6 +89,50 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
         })
 
 
+    } catch (error) {
+        return next(error)
+    }
+}
+
+export const userForgotPassword = async (req: Request, res: Response, next: NextFunction) => {
+    await handleForgotPassword(req, res, next, "user");
+}
+
+export const verifyUserPassword = async (req: Request, res: Response, next: NextFunction) => {
+    await verifyForgotPasswordOtp(req, res, next, "user")
+}
+
+export const resetUserPassword = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { email, newPassword } = req.body;
+        if (!email || !newPassword) {
+            return next(new ValidationError("Email and new Password are required!!!"))
+        }
+
+        const existingUser = await prisma.users.findUnique({ where: { email: email } })
+        if (!existingUser) {
+            return next(new ValidationError("User doesn't exists"))
+        };
+
+        const isSamePassword = await bcryptjs.compare(newPassword, existingUser.password!)
+
+        if (isSamePassword) {
+            return next(new ValidationError("New password cannot be same as the old password!"))
+        }
+
+        const hashedPassword = await bcryptjs.hash(newPassword, 10)
+        await prisma.users.update({
+            where: {
+                email: email
+            },
+            data: {
+                password: hashedPassword
+            }
+        })
+
+        res.status(200).json({
+            message: "password reset successfully"
+        })
     } catch (error) {
         return next(error)
     }
