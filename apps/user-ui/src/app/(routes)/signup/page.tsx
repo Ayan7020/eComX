@@ -110,7 +110,7 @@ const Page = () => {
                 <GoogleButton />
                 <div className="flex items-center my-5  text-gray-400 text-sm">
                     <div className="flex-1 border-t border-gray-300" />
-                    <span className="px-3">0r Sign up with Email</span>
+                    <span className="px-3">Or Sign up with Email</span>
                     <div className="flex-1 border-t border-gray-300" />
                 </div>
                 {!showOtp ? (<form onSubmit={handleSubmit(onSubmit)}>

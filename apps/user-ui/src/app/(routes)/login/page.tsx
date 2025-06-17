@@ -1,11 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import GoogleButton from "../../../shared/components/google-button"
-import { Eye, EyeClosed } from "lucide-react";
+import { Eye, EyeClosed, LoaderCircle } from "lucide-react";
+import { useMutation } from "@tanstack/react-query";
+import axios, { AxiosError } from "axios";
 type FormData = {
     email: string;
     password: string;
@@ -16,12 +18,27 @@ const Page = () => {
     const [serverError, setserverError] = useState<string | null>(null);
     const [rememberme, setrememberme] = useState(false);
 
-    // const router = useRouter();
+    const router = useRouter();
 
     const { register, handleSubmit, formState: { errors } } = useForm<FormData>();
 
-    const onSubmit = (data: FormData) => {
+    const loginMutation = useMutation({
+        mutationFn: async (data: FormData) => {
+            const response = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/login-user`, data, { withCredentials: true });
+            return response.data;
+        },
+        onSuccess: () => {
+            setserverError(null)
+            router.push("/")
+        },
+        onError: (error: AxiosError) => {
+            const errorMessage = (error.response?.data as { message?: string })?.message || "Invalid Credentials"
+            setserverError(errorMessage)
+        }
+    })
 
+    const onSubmit = (data: FormData) => {
+        loginMutation.mutate(data)
     };
 
     return <div className="w-full py-10 min-h-[85vh] bg-[#f1f1f1]">
@@ -41,7 +58,7 @@ const Page = () => {
                 <GoogleButton />
                 <div className="flex items-center my-5  text-gray-400 text-sm">
                     <div className="flex-1 border-t border-gray-300" />
-                    <span className="px-3">0r Sign in with Email</span>
+                    <span className="px-3">Or Sign in with Email</span>
                     <div className="flex-1 border-t border-gray-300" />
                 </div>
                 <form onSubmit={handleSubmit(onSubmit)}>
@@ -91,7 +108,8 @@ const Page = () => {
                             Forgot Password?
                         </Link>
                     </div>
-                    <button type="submit" className="w-full text-lg cursor-pointer bg-black text-white py-2 rounded-lg ">Login
+                    <button type="submit" disabled={loginMutation.isPending} className="w-full text-lg cursor-pointer bg-black text-white py-2 rounded-lg flex justify-center">
+                        {loginMutation.isPending ? <LoaderCircle className="animate-spin" /> : "Log In"}
                     </button>
                     {serverError && (
                         <p className="text-red-500 text-sm mt-2">{serverError}</p>
