@@ -1,5 +1,4 @@
-import axios from "axios";
-// import { resolve } from "path";
+import axios from "axios"; 
 
 const axiosInsance = axios.create({
     baseURL: process.env.NEXT_PUBLIC_SERVER_URL,
@@ -62,3 +61,4 @@ axiosInsance.interceptors.response.use(
     }
 )
 
+export default axiosInsance;
