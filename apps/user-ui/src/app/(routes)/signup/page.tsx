@@ -75,7 +75,9 @@ const Page = () => {
     };
 
     const resendOtp = () => {
-
+        if (userData){
+            signUpMutation.mutate(userData)
+        }
     }
     const handleOtpChange = (index: number, value: string) => {
         if (!/^[0-9]?$/.test(value)) return;

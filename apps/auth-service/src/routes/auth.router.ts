@@ -7,7 +7,7 @@ router.post("/user-registration", userRegisteration)
 router.post("/verify-user", verifyUser)
 router.post("/login-user", loginUser)
 router.post("/forgot-password-user", userForgotPassword)
-router.post("/reset-password-user", verifyUserPassword)
-router.post("/verify-forgot-password-user", resetUserPassword)
+router.post("/verify-forgot-password-user", verifyUserPassword)
+router.post("/reset-password-user", resetUserPassword)
 
 export default router;
