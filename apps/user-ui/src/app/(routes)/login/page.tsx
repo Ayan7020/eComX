@@ -41,7 +41,7 @@ const Page = () => {
                 <GoogleButton />
                 <div className="flex items-center my-5  text-gray-400 text-sm">
                     <div className="flex-1 border-t border-gray-300" />
-                    <span className="px-3">0r Sign in with Email</span>
+                    <span className="px-3">Or Sign in with Email</span>
                     <div className="flex-1 border-t border-gray-300" />
                 </div>
                 <form onSubmit={handleSubmit(onSubmit)}>
@@ -91,7 +91,7 @@ const Page = () => {
                             Forgot Password?
                         </Link>
                     </div>
-                    <button type="submit" className="w-full text-lg cursor-pointer bg-black text-white py-2 rounded-lg ">Login
+                    <button type="submit" className="w-full text-lg cursor-pointer bg-[#3489FF] text-white py-2 rounded-lg ">Login
                     </button>
                     {serverError && (
                         <p className="text-red-500 text-sm mt-2">{serverError}</p>

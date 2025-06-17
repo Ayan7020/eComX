@@ -57,7 +57,7 @@ const Page = () => {
         </p>
         <div className="w-full flex justify-center">
             <div className="md:w-[480px] p-8 bg-white shadow rounded-lg ">
-                <h3 className="text-3xl font-semibold text-center mb-2">Login to EComX</h3>
+                <h3 className="text-3xl font-semibold text-center mb-2">Signup to EComX</h3>
                 <p className="text-center  text-gray-500 mb-4">
                     Already have an account?
                     <Link href={"/login"} className="text-blue-500 hover:underline">Login</Link>
@@ -65,7 +65,7 @@ const Page = () => {
                 <GoogleButton />
                 <div className="flex items-center my-5  text-gray-400 text-sm">
                     <div className="flex-1 border-t border-gray-300" />
-                    <span className="px-3">0r Sign up with Email</span>
+                    <span className="px-3">Or Sign up with Email</span>
                     <div className="flex-1 border-t border-gray-300" />
                 </div>
                 {!showOtp ? (<form onSubmit={handleSubmit(onSubmit)}>
@@ -118,7 +118,7 @@ const Page = () => {
                             <p className="text-red-500 text-sm">{String(errors.password.message)}</p>
                         )}
                     </div>
-                    <button type="submit" className="w-full text-lg  mt-4 cursor-pointer bg-black text-white py-2 rounded-lg ">Signup
+                    <button type="submit" className="w-full text-lg  mt-4 cursor-pointer bg-[#3489FF] text-white py-2 rounded-lg ">Signup
                     </button>
                     {serverError && (
                         <p className="text-red-500 text-sm mt-2">{serverError}</p>
