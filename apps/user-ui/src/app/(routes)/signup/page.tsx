@@ -1,11 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import GoogleButton from "../../../shared/components/google-button"
-import { Eye, EyeClosed } from "lucide-react";
+import { Eye, EyeClosed, LoaderCircle } from "lucide-react";
+import { useMutation } from "@tanstack/react-query";
+import axios, { AxiosError } from "axios";
 
 type FormData = {
     email: string;
@@ -15,36 +17,79 @@ type FormData = {
 
 const Page = () => {
     const [passwordVisible, setpasswordVisible] = useState(false);
-    const [serverError, setserverError] = useState<string | null>(null);
     const [canResend, setcanResend] = useState(false);
     const [timer, setTimer] = useState(60);
-    const [showOtp, setshowOtp] = useState(true)
+    const [showOtp, setshowOtp] = useState(false)
     const [otp, setotp] = useState(["", "", "", ""])
     const [userData, setUserData] = useState<FormData | null>(null)
     const inputRef = useRef<(HTMLInputElement | null)[]>([])
 
 
-    // const router = useRouter();
+    const router = useRouter();
 
     const { register, handleSubmit, formState: { errors } } = useForm<FormData>();
 
-    const onSubmit = (data: FormData) => {
+    const startResendTimer = () => {
+        const interval = setInterval(() => {
+            setTimer((prev) => {
+                if (prev <= 1) {
+                    clearInterval(interval);
+                    setcanResend(true);
+                    return 0;
+                }
+                return prev - 1;
+            })
+        }, 1000)
+    }
 
+    const signUpMutation = useMutation({
+        mutationFn: async (data: FormData) => {
+            const response = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/user-registration`, data);
+            return response.data;
+        },
+        onSuccess: (_, formData) => {
+            setUserData(formData)
+            setshowOtp(true);
+            setcanResend(false);
+            setTimer(60)
+            startResendTimer();
+        }
+    });
+
+    const veriFyOtpMutation = useMutation({
+        mutationFn: async () => {
+            if (!userData) return;
+            const response = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/verify-user`, {
+                ...userData,
+                otp: otp.join(""),
+            });
+            return response.data;
+        },
+        onSuccess: () => {
+            router.push("/login")
+        }
+    });
+
+    const onSubmit = (data: FormData) => {
+        signUpMutation.mutate(data)
     };
 
-    const handleOtpChange = (index: number,value: string) => {
-        if(!/^[0-9]?$/.test(value)) return;
+    const resendOtp = () => {
+
+    }
+    const handleOtpChange = (index: number, value: string) => {
+        if (!/^[0-9]?$/.test(value)) return;
         const newOtp = [...otp];
         newOtp[index] = value;
         setotp(newOtp);
-        if(value && index < inputRef.current.length - 1){
+        if (value && index < inputRef.current.length - 1) {
             console.log(inputRef.current.length)
             inputRef.current[index + 1]?.focus()
         }
     }
 
-    const handleOtpKeyDown = (index: number,e: React.KeyboardEvent<HTMLInputElement>) => {
-        if(e.key === "Backspace" && !otp[index] && index > 0) {
+    const handleOtpKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === "Backspace" && !otp[index] && index > 0) {
             inputRef.current[index - 1]?.focus()
         }
     }
@@ -57,7 +102,7 @@ const Page = () => {
         </p>
         <div className="w-full flex justify-center">
             <div className="md:w-[480px] p-8 bg-white shadow rounded-lg ">
-                <h3 className="text-3xl font-semibold text-center mb-2">Login to EComX</h3>
+                <h3 className="text-3xl font-semibold text-center mb-2">Signup to EComX</h3>
                 <p className="text-center  text-gray-500 mb-4">
                     Already have an account?
                     <Link href={"/login"} className="text-blue-500 hover:underline">Login</Link>
@@ -118,41 +163,55 @@ const Page = () => {
                             <p className="text-red-500 text-sm">{String(errors.password.message)}</p>
                         )}
                     </div>
-                    <button type="submit" className="w-full text-lg  mt-4 cursor-pointer bg-black text-white py-2 rounded-lg ">Signup
+                    <button type="submit" disabled={signUpMutation.isPending} className="w-full text-lg  mt-4 cursor-pointer bg-black text-white py-2 rounded-lg flex items-center justify-center">
+                        {signUpMutation.isPending ? <LoaderCircle className="animate-spin" /> : "Sign Up"}
                     </button>
-                    {serverError && (
-                        <p className="text-red-500 text-sm mt-2">{serverError}</p>
-                    )}
+                    {
+                        signUpMutation?.isError &&
+                        signUpMutation.error instanceof AxiosError && (
+                            <p className="text-red-800 text-sm mt-2 p-4 rounded-xl" style={{ backgroundColor: "rgba(220, 38, 38, 0.3)" }}>
+                                {signUpMutation.error.response?.data?.message || signUpMutation.error.message}
+                            </p>
+                        )
+                    }
                 </form>) : (
                     <div>
                         <h3 className="text-xl font-semibold text-center mb-4">Enter Otp</h3>
                         <div className="flex justify-center gap-6">
-                            {otp?.map((digit,index) => (
-                                <input type="text"  key={index} ref={(el) => {
-                                    if(el) inputRef.current[index] = el;
+                            {otp?.map((digit, index) => (
+                                <input type="text" key={index} ref={(el) => {
+                                    if (el) inputRef.current[index] = el;
                                 }}
-                                maxLength={1}
-                                className="w-12 h-12 text-center border  border-gray-300 outline-none !rounded"
-                                value={digit}
-                                onChange={(e) => handleOtpChange(index,e.target.value)}
-                                onKeyDown={(e) => handleOtpKeyDown(index,e)}
+                                    maxLength={1}
+                                    className="w-12 h-12 text-center border  border-gray-300 outline-none !rounded"
+                                    value={digit}
+                                    onChange={(e) => handleOtpChange(index, e.target.value)}
+                                    onKeyDown={(e) => handleOtpKeyDown(index, e)}
                                 />
                             ))}
                         </div>
-                        <button className="w-full text-lg  mt-4 cursor-pointer bg-blue-500 text-white py-2 rounded-lg">
-                            Verify Otp
+                        <button disabled={veriFyOtpMutation.isPending} onClick={() => veriFyOtpMutation.mutate()} className="w-full text-lg  mt-4 cursor-pointer bg-blue-500 text-white py-2 rounded-lg">
+                            {veriFyOtpMutation.isPending ? <LoaderCircle className="animate-spin" /> : "Verify OTP"}
                         </button>
                         <p className="text-center text-sm mt-4">
                             {
                                 canResend ? (
-                                    <button className="cursor-pointer text-blue-500">
+                                    <button className="cursor-pointer text-blue-500" onClick={resendOtp}>
                                         Resend Otp
                                     </button>
-                                ): (
+                                ) : (
                                     `Resend OTP in ${timer}s`
                                 )
                             }
                         </p>
+                        {
+                            veriFyOtpMutation?.isError &&
+                            veriFyOtpMutation.error instanceof AxiosError && (
+                                <p className="text-red-500 text-sm mt-2">
+                                    {veriFyOtpMutation.error.response?.data?.message || veriFyOtpMutation.error.message}
+                                </p>
+                            )
+                        }
                     </div>
                 )}
             </div>
