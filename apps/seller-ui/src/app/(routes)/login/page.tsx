@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import { Eye, EyeClosed, LoaderCircle } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
+
 type FormData = {
     email: string;
     password: string;
