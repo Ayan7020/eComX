@@ -2,7 +2,7 @@
 export const Page = () => {
   return (
     <div>
-      Home Seller Page
+      Signup Page
     </div>
   )
 }
