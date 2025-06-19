@@ -187,3 +187,25 @@ export const resetUserPassword = async (req: Request, res: Response, next: NextF
         return next(error)
     }
 }
+
+export const regiserSeller = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        validateRegistrationData(req.body, "seller")
+        const { name, email } = req.body;
+        const existingUser = await prisma.sellers.findUnique({ where: { email: email } })
+
+        if (existingUser) {
+            throw new ValidationError("seller already exists")
+        }
+
+        await checkOtpRestrictions(email, next)
+        await trackOTPRequests(email, next)
+        await sendOTP(name,email,"seller-activation")
+
+        res.status(200).json({
+            message: "Otp sent to email. Please verify our account."
+        })
+    } catch (error) {
+        next(error)
+    }
+}
