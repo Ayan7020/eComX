@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
-import { Form, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { Eye, EyeClosed, LoaderCircle } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
@@ -20,10 +20,11 @@ type FormData = {
 const Page = () => {
   const [passwordVisible, setpasswordVisible] = useState(false);
   const [canResend, setcanResend] = useState(false);
+  const [sellerId, setSellerId] = useState("");
   const [timer, setTimer] = useState(60);
   const [showOtp, setshowOtp] = useState(false)
   const [otp, setotp] = useState(["", "", "", ""])
-  const [userData, setUserData] = useState<FormData | null>(null)
+  const [sellerData, setsellerData] = useState<FormData | null>(null)
   const inputRef = useRef<(HTMLInputElement | null)[]>([])
   const [activeStep, setActiveStep] = useState(1);
 
@@ -50,7 +51,7 @@ const Page = () => {
       return response.data;
     },
     onSuccess: (_, formData) => {
-      setUserData(formData)
+      setsellerData(formData)
       setshowOtp(true);
       setcanResend(false);
       setTimer(60)
@@ -60,15 +61,16 @@ const Page = () => {
 
   const veriFyOtpMutation = useMutation({
     mutationFn: async () => {
-      if (!userData) return;
+      if (!sellerData) return;
       const response = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/verify-seller-registration`, {
-        ...userData,
+        ...sellerData,
         otp: otp.join(""),
       });
       return response.data;
     },
-    onSuccess: () => {
-      router.push("/login")
+    onSuccess: (data) => {
+      setSellerId(data?.seller?.id)
+      setActiveStep(2);
     }
   });
 
@@ -77,8 +79,8 @@ const Page = () => {
   };
 
   const resendOtp = () => {
-    if (userData) {
-      signUpMutation.mutate(userData)
+    if (sellerData) {
+      signUpMutation.mutate(sellerData)
     }
   }
   const handleOtpChange = (index: number, value: string) => {

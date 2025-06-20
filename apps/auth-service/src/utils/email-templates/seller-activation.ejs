@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>EComX Activation Mail</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f6f9fc;
+      margin: 0;
+      padding: 0;
+    }
+
+    .email-container {
+      max-width: 600px;
+      margin: 40px auto;
+      background: #ffffff;
+      padding: 30px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+    }
+
+    .header {
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      color: #333333;
+      margin-bottom: 20px;
+    }
+
+    .greeting {
+      font-size: 18px;
+      color: #555555;
+      margin-bottom: 20px;
+    }
+
+    .otp-box {
+      text-align: center;
+      font-size: 28px;
+      font-weight: bold;
+      color: #2c3e50;
+      background: #f0f3f7;
+      padding: 15px;
+      border-radius: 6px;
+      letter-spacing: 4px;
+      margin: 20px 0;
+    }
+
+    .footer {
+      font-size: 14px;
+      color: #888888;
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .footer a {
+      color: #888888;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="email-container">
+    <div class="header">Activate Your Seller Account</div>
+    
+    <div class="greeting">
+      Hello <%= name %>,
+      <br /><br />
+      Use the following OTP to activate your account:
+    </div>
+
+    <div class="otp-box">
+      <%= otp %>
+    </div>
+
+    <div class="greeting">
+      This OTP is valid for the next 10 minutes. Do not share it with anyone.
+    </div>
+
+    <div class="footer">
+      &copy; <%= new Date().getFullYear() %> YourCompany. All rights reserved.
+      <br />
+      <a href="https://yourcompany.com">yourcompany.com</a>
+    </div>
+  </div>
+</body>
+</html>

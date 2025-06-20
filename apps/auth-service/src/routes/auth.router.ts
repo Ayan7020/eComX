@@ -13,8 +13,8 @@ router.post("/verify-forgot-password-user", verifyUserPassword)
 router.post("/reset-password-user", resetUserPassword)
 router.get("/logged-in-user", isAuthenticated, getUser)
 
-router.get("/seller-registration", regiserSeller)
-router.get("/verify-seller-registration", verifySeller)
-router.get("/create-shop", createShop)
+router.post("/seller-registration", regiserSeller)
+router.post("/verify-seller-registration", verifySeller)
+router.post("/create-shop", createShop)
 
 export default router;
