@@ -200,7 +200,7 @@ export const regiserSeller = async (req: Request, res: Response, next: NextFunct
 
         await checkOtpRestrictions(email, next)
         await trackOTPRequests(email, next)
-        await sendOTP(name,email,"seller-activation")
+        await sendOTP(name, email, "seller-activation")
 
         res.status(200).json({
             message: "Otp sent to email. Please verify our account."
@@ -209,3 +209,73 @@ export const regiserSeller = async (req: Request, res: Response, next: NextFunct
         next(error)
     }
 }
+
+export const verifySeller = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { email, otp, password, name, phone_number, country } = req.body;
+
+        if (!email || !otp || !password || !name || !phone_number || !country) {
+            throw new ValidationError("All Fields are required")
+        }
+
+        const existingUser = await prisma.sellers.findUnique({ where: { email: email } })
+
+        if (existingUser) {
+            throw new ValidationError("Selller alreay exists")
+        }
+
+        await verifyOtp(email, otp)
+        const hashedPassword = await bcryptjs.hash(password, 10)
+
+        const seller = await prisma.sellers.create({
+            data: {
+                name: name,
+                email: email,
+                password: hashedPassword,
+                country: country,
+                phone_number: phone_number
+            }
+        })
+
+        res.status(200).json({
+            message: "Seller register successfully"
+        })
+
+    } catch (error) {
+        next(error)
+    }
+}
+
+export const createShop = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { name, bio, address, openning_hours, website, category, sellerId } = req.body;
+
+        if (!name || !bio || !address || !openning_hours || !category || !sellerId) {
+            throw new ValidationError("All Fields are required")
+        }
+
+        const shopData: any = {
+            name: name,
+            bio: bio,
+            address: address,
+            openning_hours: openning_hours,
+            category: category,
+            sellerId: sellerId
+        }
+
+        if (website && website.trim() !== "") {
+            shopData.website = website
+        }
+
+        const shop = await prisma.shops.create({ data: shopData })
+
+        res.status(200).json({
+            success: true,
+            shop
+        })
+
+    } catch (error) {
+        next(error)
+    }
+}
+

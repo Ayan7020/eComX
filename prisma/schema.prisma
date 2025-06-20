@@ -66,10 +66,12 @@ model sellers {
   name         String
   email        String   @unique
   phone_number String
+  country      String
   password     String
-  stripeId     String
+  stripeId     String?
   shop         shops?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   shopId       String?  @db.ObjectId
-} 
+  shopsId      String?  @db.ObjectId
+}
