@@ -5,6 +5,10 @@ import { AuthError, ValidationError } from "@packages/error-handler";
 import bcryptjs from "bcryptjs"
 import jwt, { JsonWebTokenError } from "jsonwebtoken"
 import { setCookie } from "../utils/cookies/setCookie";
+import Stripe from "stripe";
+
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 export const userRegisteration = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -73,8 +77,8 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
             return next(new AuthError("Invalid Email or Password"))
         }
 
-        const accesToken = jwt.sign({ id: existingUser.id, role: "User" }, process.env.ACCESS_TOKEN_SECRET as string, { expiresIn: "15m" })
-        const refreshToken = jwt.sign({ id: existingUser.id, role: "User" }, process.env.REFRESH_TOKEN_SECRET as string, { expiresIn: "7d" })
+        const accesToken = jwt.sign({ id: existingUser.id, role: "user" }, process.env.ACCESS_TOKEN_SECRET as string, { expiresIn: "15m" })
+        const refreshToken = jwt.sign({ id: existingUser.id, role: "user" }, process.env.REFRESH_TOKEN_SECRET as string, { expiresIn: "7d" })
 
         setCookie(res, "refresh_token", refreshToken)
         setCookie(res, "access_token", accesToken)
@@ -120,7 +124,7 @@ export const refreshToken = async (req: Request, res: Response, next: NextFuncti
             return new AuthError("Fobidden! User don't found")
         }
 
-        const newaccessToken = jwt.sign({ id: User.id, role: "User" }, process.env.ACCESS_TOKEN_SECRET as string, { expiresIn: "15m" })
+        const newaccessToken = jwt.sign({ id: User.id, role: "user" }, process.env.ACCESS_TOKEN_SECRET as string, { expiresIn: "15m" })
         setCookie(res, "access_token", newaccessToken)
 
         return res.status(201).json({
@@ -238,7 +242,12 @@ export const verifySeller = async (req: Request, res: Response, next: NextFuncti
         })
 
         res.status(200).json({
-            message: "Seller register successfully"
+            message: "Seller register successfully",
+            data: {
+                seller: {
+                    id: seller.id
+                }
+            }
         })
 
     } catch (error) {
@@ -279,3 +288,100 @@ export const createShop = async (req: Request, res: Response, next: NextFunction
     }
 }
 
+export const createStripeCOnnectLink = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { sellerId } = req.body
+        if (!sellerId) {
+            throw new ValidationError("Seller Id is not present")
+        }
+
+        const seller = await prisma.sellers.findUnique({
+            where: {
+                id: sellerId
+            }
+        });
+        if (!seller) {
+            throw new ValidationError("Seller is not available with this id!")
+        }
+        const account = await stripe.accounts.create({
+            type: "express",
+            email: seller.email,
+            country: "GB",
+            capabilities: {
+                card_payments: { requested: true },
+                transfers: { requested: true }
+            }
+        });
+
+        await prisma.sellers.update({
+            where: {
+                id: sellerId
+            },
+            data: {
+                stripeId: account.id
+            }
+        })
+
+        const accountLink = await stripe.accountLinks.create({
+            account: account.id,
+            refresh_url: `http://localhost:3000/success`,
+            return_url: `http://localhost:3000/success`,
+            type: "account_onboarding"
+        })
+
+        res.json({
+            url: accountLink.url
+        })
+
+    } catch (error) {
+        next(error)
+    }
+}
+
+export const LoginSeller = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { email, password } = req.body;
+        if (!email || !password) {
+            return next(new ValidationError("All Fields are required!!!"))
+        }
+        const existingUser = await prisma.sellers.findUnique({ where: { email: email } })
+        if (!existingUser) {
+            return next(new ValidationError("Seller doesn't exists"))
+        };
+        const isMatch = await bcryptjs.compare(password, existingUser.password!)
+        if (!isMatch) {
+            return next(new AuthError("Invalid Email or Password"))
+        }
+
+        const accesToken = jwt.sign({ id: existingUser.id, role: "seller" }, process.env.ACCESS_TOKEN_SECRET as string, { expiresIn: "15m" })
+        const refreshToken = jwt.sign({ id: existingUser.id, role: "seller" }, process.env.REFRESH_TOKEN_SECRET as string, { expiresIn: "7d" })
+
+        setCookie(res, "seller-refresh-token", refreshToken)
+        setCookie(res, "seller-access-token", accesToken)
+
+        res.status(200).json({
+            message: "Login Successfull",
+            user: {
+                id: existingUser.id,
+                email: existingUser.email,
+                name: existingUser.name
+            }
+        })
+
+
+    } catch (error) {
+        return next(error)
+    }
+} 
+
+export const getSeller = async (req: any, res: Response, next: NextFunction) => {
+    try {
+        const seller = req.seller;
+        return res.status(200).json({
+            success: true,
+            seller
+        })
+    } catch (error) {
+        return next(error)
+    }
+}
