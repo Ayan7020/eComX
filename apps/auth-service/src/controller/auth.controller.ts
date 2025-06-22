@@ -243,10 +243,8 @@ export const verifySeller = async (req: Request, res: Response, next: NextFuncti
 
         res.status(200).json({
             message: "Seller register successfully",
-            data: {
-                seller: {
-                    id: seller.id
-                }
+            seller: {
+                id: seller.id
             }
         })
 
@@ -267,7 +265,7 @@ export const createShop = async (req: Request, res: Response, next: NextFunction
             name: name,
             bio: bio,
             address: address,
-            openning_hours: openning_hours,
+            opening_hours: openning_hours,
             category: category,
             sellerId: sellerId
         }
@@ -372,7 +370,7 @@ export const LoginSeller = async (req: Request, res: Response, next: NextFunctio
     } catch (error) {
         return next(error)
     }
-} 
+}
 
 export const getSeller = async (req: any, res: Response, next: NextFunction) => {
     try {

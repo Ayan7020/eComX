@@ -27,7 +27,7 @@ const Page = () => {
   const [otp, setotp] = useState(["", "", "", ""])
   const [sellerData, setsellerData] = useState<FormData | null>(null)
   const inputRef = useRef<(HTMLInputElement | null)[]>([])
-  const [activeStep, setActiveStep] = useState(3);
+  const [activeStep, setActiveStep] = useState(1);
 
   const router = useRouter();
 
@@ -70,6 +70,7 @@ const Page = () => {
       return response.data;
     },
     onSuccess: (data) => {
+      console.log("OTP Verified:", data);
       setSellerId(data?.seller?.id)
       setActiveStep(2);
     }

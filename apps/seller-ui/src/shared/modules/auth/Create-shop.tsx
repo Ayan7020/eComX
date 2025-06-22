@@ -19,6 +19,7 @@ const Page = ({ sellerId, setActiveStep }: { sellerId: string, setActiveStep: (s
     })
 
     const onSubmit = (data: any) => {
+        console.log("Form Data:", sellerId);
         const shopData = { ...data, sellerId };
         shopCreationMutation.mutate(shopData);
     }
