@@ -83,6 +83,9 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
         setCookie(res, "refresh_token", refreshToken)
         setCookie(res, "access_token", accesToken)
 
+        res.clearCookie("seller-refresh-token")
+        res.clearCookie("seller-access-token")
+
         res.status(200).json({
             message: "Login Successfull",
             user: {
@@ -98,9 +101,9 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
     }
 }
 
-export const refreshToken = async (req: Request, res: Response, next: NextFunction) => {
+export const refreshToken = async (req: any, res: Response, next: NextFunction) => {
     try {
-        const refresh_token = req.cookies.refresh_token;
+        const refresh_token = req.cookies["refresh_token"] || req.cookies["seller-refresh-token"] || req.headers.authorization?.split(" ")[1];
         if (!refresh_token) {
             throw new ValidationError("Unauthorized! no refresh token!");
         }
@@ -114,18 +117,35 @@ export const refreshToken = async (req: Request, res: Response, next: NextFuncti
         if (!decoded || !decoded.id || !decoded.role) {
             return new JsonWebTokenError("Forbidden Invalid refresh Token.")
         }
-        const User = await prisma.users.findUnique({
-            where: {
-                id: decoded.id
-            }
-        })
 
-        if (!User) {
-            return new AuthError("Fobidden! User don't found")
+        let account
+        if (decoded.role === "user") {
+            account = await prisma.users.findUnique({
+                where: {
+                    id: decoded.id
+                }
+            })
+        } else if (decoded.role === "seller") {
+            account = await prisma.sellers.findUnique({
+                where: {
+                    id: decoded.id
+                }
+            })
+        } 
+
+        if (!account) {
+            return new AuthError("Fobidden! Account don't found")
         }
 
-        const newaccessToken = jwt.sign({ id: User.id, role: "user" }, process.env.ACCESS_TOKEN_SECRET as string, { expiresIn: "15m" })
-        setCookie(res, "access_token", newaccessToken)
+        const newaccessToken = jwt.sign({ id: account.id, role: decoded.role }, process.env.ACCESS_TOKEN_SECRET as string, { expiresIn: "15m" })
+        
+        if(decoded.role === "user") {
+            setCookie(res, "access_token", newaccessToken)
+        } else if (decoded.role === "seller") {
+            setCookie(res,"seller-access-token",newaccessToken)
+        }
+
+        req.role = decoded.role
 
         return res.status(201).json({
             success: true
@@ -357,9 +377,12 @@ export const LoginSeller = async (req: Request, res: Response, next: NextFunctio
         setCookie(res, "seller-refresh-token", refreshToken)
         setCookie(res, "seller-access-token", accesToken)
 
+        res.clearCookie("access_token")
+        res.clearCookie("refresh_token")
+
         res.status(200).json({
             message: "Login Successfull",
-            user: {
+            seller: {
                 id: existingUser.id,
                 email: existingUser.email,
                 name: existingUser.name

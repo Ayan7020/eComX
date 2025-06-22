@@ -8,7 +8,7 @@ const router: Router = express.Router();
 router.post("/user-registration", userRegisteration)
 router.post("/verify-user", verifyUser)
 router.post("/login-user", loginUser)
-router.post("/refresh-token-user", refreshToken)
+router.post("/refresh-token", refreshToken)
 router.post("/forgot-password-user", userForgotPassword)
 router.post("/verify-forgot-password-user", verifyUserPassword)
 router.post("/reset-password-user", resetUserPassword)
@@ -20,7 +20,7 @@ router.post("/create-shop", createShop)
 
 router.post("/create-stripe-link", createStripeCOnnectLink)
 router.post("/login-seller", LoginSeller)
-router.get("/logged-in-seller", isAuthenticated, isSeller, LoginSeller)
+router.get("/logged-in-seller", isAuthenticated, isSeller, getSeller)
 
 
 

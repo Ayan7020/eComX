@@ -71,7 +71,5 @@ model sellers {
   stripeId     String?
   shop         shops?
   createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  shopId       String?  @db.ObjectId
-  shopsId      String?  @db.ObjectId
+  updatedAt    DateTime @updatedAt 
 }
