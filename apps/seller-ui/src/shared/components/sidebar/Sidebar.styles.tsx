@@ -67,6 +67,7 @@ export const Header = styled.div`
     align-items: center;
     padding-left: var(--space-10);
     padding-right: var(--space-10);
+    margin-bottom: 10px;
 `;
 
 export const Body = styled.div`

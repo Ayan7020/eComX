@@ -58,13 +58,13 @@ const SidebarWrapper = () => {
                                 isActive={activeSidebar === "/dashboard/orders"}
                                 title="Orders"
                                 href="/dashboard/orders"
-                                icon={<ListOrdered size={24} color={getIconColor("/darshboard/orders")} />}
+                                icon={<ListOrdered size={24} color={getIconColor("/dashboard/orders")} />}
                             />
                             <SidebarItems
                                 isActive={activeSidebar === "/dashboard/payments"}
                                 title="Payments"
                                 href="/dashboard/payments"
-                                icon={<WalletCards size={24} color={getIconColor("/darshboard/payments")} />}
+                                icon={<WalletCards size={24} color={getIconColor("/dashboard/payments")} />}
                             />
                         </SidebarMenu>
                         <SidebarMenu title="Products">
@@ -72,13 +72,13 @@ const SidebarWrapper = () => {
                                 isActive={activeSidebar === "/dashboard/create-product"}
                                 title="Create Product"
                                 href="/dashboard/create-product"
-                                icon={<SquarePlus size={24} color={getIconColor("/darshboard/create-product")} />}
+                                icon={<SquarePlus size={24} color={getIconColor("/dashboard/create-product")} />}
                             />
                             <SidebarItems
                                 isActive={activeSidebar === "/dashboard/all-products"}
                                 title="All Products"
                                 href="/dashboard/all-products"
-                                icon={<PackageSearch size={24} color={getIconColor("/darshboard/all-products")} />}
+                                icon={<PackageSearch size={24} color={getIconColor("/dashboard/all-products")} />}
                             />
                         </SidebarMenu>
                         <SidebarMenu title="Events">
@@ -86,13 +86,13 @@ const SidebarWrapper = () => {
                                 isActive={activeSidebar === "/dashboard/create-event"}
                                 title="Create Event"
                                 href="/dashboard/create-event"
-                                icon={<CalendarPlus size={24} color={getIconColor("/darshboard/create-event")} />}
+                                icon={<CalendarPlus size={24} color={getIconColor("/dashboard/create-event")} />}
                             />
                             <SidebarItems
                                 isActive={activeSidebar === "/dashboard/all-events"}
                                 title="All Events"
                                 href="/dashboard/all-events"
-                                icon={<BellPlus size={24} color={getIconColor("/darshboard/all-events")} />}
+                                icon={<BellPlus size={24} color={getIconColor("/dashboard/all-events")} />}
                             />
                         </SidebarMenu>
                         <SidebarMenu title="Controllers">
@@ -100,19 +100,19 @@ const SidebarWrapper = () => {
                                 isActive={activeSidebar === "/dashboard/inbox"}
                                 title="Inbox"
                                 href="/dashboard/inbox"
-                                icon={<Mail size={24} color={getIconColor("/darshboard/inbox")} />}
+                                icon={<Mail size={24} color={getIconColor("/dashboard/inbox")} />}
                             />
                             <SidebarItems
                                 isActive={activeSidebar === "/dashboard/settings"}
                                 title="Settings"
                                 href="/dashboard/settings"
-                                icon={<Settings size={24} color={getIconColor("/darshboard/settings")} />}
+                                icon={<Settings size={24} color={getIconColor("/dashboard/settings")} />}
                             />
                             <SidebarItems
                                 isActive={activeSidebar === "/dashboard/notifications"}
                                 title="Notifications"
                                 href="/dashboard/notifications"
-                                icon={<BellRing size={24} color={getIconColor("/darshboard/notifications")} />}
+                                icon={<BellRing size={24} color={getIconColor("/dashboard/notifications")} />}
                             />
                         </SidebarMenu>
                         <SidebarMenu title="Extras">
@@ -120,13 +120,13 @@ const SidebarWrapper = () => {
                                 isActive={activeSidebar === "/dashboard/discount-codes"}
                                 title="Discount Codes"
                                 href="/dashboard/discount-codes"
-                                icon={<TicketPercent size={22} color={getIconColor("/darshboard/discount-codes")} />}
+                                icon={<TicketPercent size={22} color={getIconColor("/dashboard/discount-codes")} />}
                             /> 
                             <SidebarItems
                                 isActive={activeSidebar === "/dashboard/logout"}
                                 title="Logout"
                                 href="/dashboard/logout"
-                                icon={<LogOut size={22} color={getIconColor("/darshboard/logout")} />}
+                                icon={<LogOut size={22} color={getIconColor("/dashboard/logout")} />}
                             /> 
                         </SidebarMenu>
                     </div>
